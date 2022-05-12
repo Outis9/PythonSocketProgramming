@@ -1,12 +1,11 @@
-from email import message
 import socket
 
 HEADER = 64
 PORT = 5050
 FORMAT='utf-8'
 DISCONNECT_MESSAGE='!DISCONNECT'
-#SERVER='59.79.1.109'
-SERVER='192.133.25.184'
+SERVER='59.79.2.32'
+# SERVER='192.133.25.184'
 ADDR=(SERVER,PORT)
 
 client=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -19,6 +18,7 @@ def send(msg):
     send_length += b' '*(HEADER - len(send_length))
     client.send(send_length)
     client.send(message)
+    # if client.recv(2048).decode(FORMAT) == ''
     print(client.recv(2048).decode(FORMAT))
 
 def login(uer, pwd):
@@ -53,19 +53,20 @@ def login(uer, pwd):
       return False
 
 def main():
-    print("欢迎登录xxx系统")
     uer = input("请输入用户名:")
     pwd = input("请输入密码:")
     flag=login(uer, pwd)
     if flag:
-        send('Hello World!')
-        input()
-        send('Hello EVERYONE!')
-        input()
-        send('Hello OUTIS!')
-        input()
-        send('Hello World!')
-        input()
-        send(DISCONNECT_MESSAGE)#中止
+        tmp = True
+        while tmp:
+            text = input('请输入内容(quit-退出,recv-接受服务器信息): ')
+            if text == 'quit':
+                send(DISCONNECT_MESSAGE)
+                tmp = False
+            elif text == 'recv':
+                print(client.recv(2048).decode(FORMAT))
+            else:
+                send(text)
 
-main()
+if __name__=="__main__":
+    main()

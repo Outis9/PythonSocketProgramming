@@ -11,6 +11,12 @@ ADDR = (SERVER,PORT)
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 server.bind(ADDR)
 
+messageList = []
+addr_pool = []
+conn_pool = []
+host = []
+
+
 
 def handle_client(conn,addr):
     print(f"[NEW CONNECTION] {addr} connected.\n")
@@ -22,9 +28,18 @@ def handle_client(conn,addr):
             msg=conn.recv(msg_length).decode(FORMAT)
             if msg==DISCONNECT_MESSAGE:
                 connected=False
+            else:
+                messageList.append((addr,msg)) 
             print(f"[{addr}] {msg} ")
-            conn.send("Msg received".encode(FORMAT))
+            conn.sendall(msg.upper().encode(FORMAT))
     conn.close()
+
+def boardcast(msg):
+  for i in range(0,len(conn_pool)):
+    conn_pool[i].sendall(msg.encode(FORMAT))
+
+def forwarding(index,msg):
+    conn_pool[index].sendall(msg.encode(FORMAT))
 
 def select(username, password):
   """
@@ -65,11 +80,50 @@ def start():
     print(f"[LISTENING] Server is listening on {SERVER}")
     while True:
         conn,addr=server.accept()
+        addr_pool.append(addr)
+        conn_pool.append(conn)
         set=testlogin(conn)     #验证身份
         if set:
           thread = threading.Thread(target=handle_client,args=(conn,addr))
           thread.start()
-          print(f"[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
+          print(f"[ACTIVE CONNECTIONS] {threading.activeCount()-2}\n")
 
-print("[STARTING] sever is starting ...")
-start()
+if __name__ == "__main__":
+  print("[STARTING] sever is starting ...")
+  thread2 = threading.Thread(target=start)
+  thread2.start()
+  while True:
+    cmd = input('''
+    1:查看在线人数
+    2:查看所有信息
+    3:广播在线客户端信息
+    4:广播任意输入的信息
+    5:转发信息
+    6:转发消息
+    7:退出
+    ''')
+    if cmd == '1':
+      print('当前在线人数:', len(addr_pool),addr_pool)
+      
+    elif cmd == '2':
+      print('信息列表:',messageList)
+    
+    elif cmd == '3':
+      for h,p in addr_pool:
+        text = h+':'+str(p)
+        host.append(text)
+      content = ' , '.join(host)
+      boardcast('在线：'+content)
+
+    elif cmd == '4':
+      content = input("需要广播的信息:")
+      boardcast(content)
+
+    elif cmd == '5':
+      addr,msg = messageList[0]
+      forwarding(1,msg)
+    elif cmd == '6':
+      addr,msg = messageList[1]
+      forwarding(0,msg)
+    elif cmd == '7':
+      exit()
