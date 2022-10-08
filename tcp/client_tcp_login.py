@@ -4,8 +4,7 @@ HEADER = 64
 PORT = 5050
 FORMAT='utf-8'
 DISCONNECT_MESSAGE='!DISCONNECT'
-SERVER='59.79.2.32'
-# SERVER='192.133.25.184'
+SERVER='192.168.157.1'
 ADDR=(SERVER,PORT)
 
 client=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -26,7 +25,7 @@ def login(uer, pwd):
   将用户名和密码发送给server验证
   :param username:用户名
   :param paaword:密码
-  :return:True,用户验证成功；False，用户验证失败
+  :return:True,用户验证成功;False,用户验证失败
   """
   #传username
   username=uer.encode(FORMAT)       

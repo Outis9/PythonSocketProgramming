@@ -16,8 +16,6 @@ addr_pool = []
 conn_pool = []
 host = []
 
-
-
 def handle_client(conn,addr):
     print(f"[NEW CONNECTION] {addr} connected.\n")
     connected=True
@@ -46,7 +44,7 @@ def select(username, password):
   用于用户名和密码的验证
   :param username:用户名
   :param paaword:密码
-  :return:True,用户验证成功；False，用户验证失败
+  :return:True,用户验证成功;False,用户验证失败
   """
   try:
     f = open("users.txt", "r", encoding="utf-8")
